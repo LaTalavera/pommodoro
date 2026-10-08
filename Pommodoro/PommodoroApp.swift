@@ -5,15 +5,21 @@ import SwiftUI
 struct PommodoroApp: App {
     private let container: ModelContainer
     @State private var engine: PomodoroEngine
+    #if os(macOS)
+    private let dockBadge: DockBadge
+    static let timerWindowID = "timer"
+    #endif
 
     init() {
         let container = Self.makeContainer()
         self.container = container
-        _engine = State(
-            initialValue: PomodoroEngine(
-                recorder: SwiftDataSessionRecorder(context: container.mainContext)
-            )
+        let engine = PomodoroEngine(
+            recorder: SwiftDataSessionRecorder(context: container.mainContext)
         )
+        _engine = State(initialValue: engine)
+        #if os(macOS)
+        dockBadge = DockBadge(engine: engine)
+        #endif
     }
 
     /// El almacén va a una ruta explícita cuyo directorio creamos nosotros:
@@ -63,13 +69,28 @@ struct PommodoroApp: App {
         #if os(macOS)
         // Una sola ventana: hay un único temporizador, y cada ventana
         // duplicaría el sonido, los avisos y el sondeo de Concentración.
-        Window("Pommodoro", id: "timer") {
+        Window("Pommodoro", id: Self.timerWindowID) {
             TimerView()
                 .environment(engine)
                 .frame(minWidth: 480, minHeight: 640)
         }
         .defaultSize(width: 960, height: 760)
         .modelContainer(container)
+
+        // Ventana de Ajustes propia del Mac (⌘,), en vez de una hoja.
+        Settings {
+            SettingsSheet(showsDoneButton: false)
+                .environment(engine)
+                .frame(width: 520, height: 680)
+                .preferredColorScheme(.dark)
+        }
+
+        // Con la ventana cerrada la app sigue viva aquí, con la cuenta atrás.
+        MenuBarExtra {
+            MenuBarTimerMenu(engine: engine)
+        } label: {
+            MenuBarTimerLabel(engine: engine)
+        }
         #else
         WindowGroup {
             TimerView()

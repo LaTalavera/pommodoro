@@ -6,6 +6,14 @@ struct SettingsSheet: View {
 
     @Bindable private var settings = AppSettings.shared
 
+    /// En la ventana de Ajustes del Mac sobra el «Listo»: se cierra como
+    /// cualquier ventana.
+    private let showsDoneButton: Bool
+
+    init(showsDoneButton: Bool = true) {
+        self.showsDoneButton = showsDoneButton
+    }
+
     /// Combinaciones habituales, para no tener que tocar tres steppers.
     private static let presets: [(name: String, work: Int, short: Int, long: Int)] = [
         ("Clásico", 25, 5, 15),
@@ -115,8 +123,10 @@ struct SettingsSheet: View {
             .navigationTitle("Ajustes")
             .inlineNavigationTitle()
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Listo") { dismiss() }
+                if showsDoneButton {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Listo") { dismiss() }
+                    }
                 }
             }
         }
