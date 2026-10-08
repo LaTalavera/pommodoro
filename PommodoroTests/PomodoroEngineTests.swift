@@ -43,6 +43,7 @@ final class SpyEffects: PomodoroEffects {
     private(set) var cancelCount = 0
     private(set) var chimes: [ChimeKind] = []
     private(set) var fadeOuts = 0
+    private(set) var ambiences: [SoundConfig] = []
     private(set) var haptics: [HapticCue] = []
     private(set) var idleTimerDisabled = false
 
@@ -52,6 +53,7 @@ final class SpyEffects: PomodoroEffects {
     func cancelScheduledEnd() { cancelCount += 1 }
     func playChime(_ kind: ChimeKind) { chimes.append(kind) }
     func fadeOutAmbience() { fadeOuts += 1 }
+    func applyAmbience(_ config: SoundConfig) { ambiences.append(config) }
     func haptic(_ cue: HapticCue) { haptics.append(cue) }
     func setIdleTimerDisabled(_ disabled: Bool) { idleTimerDisabled = disabled }
 }
@@ -561,6 +563,66 @@ struct FadeTests {
 
         #expect(h.effects.fadeOuts == 0)
         #expect(h.effects.chimes.isEmpty)
+    }
+}
+
+// MARK: - Fondo sonoro por fase
+
+/// El motor cambia el fondo al cambiar de fase, sin depender de que haya una
+/// ventana abierta que lo observe (en el Mac la app sigue en la barra de menús).
+@MainActor
+@Suite("Fondo sonoro de cada fase")
+struct AmbienceTests {
+
+    private func harness() -> Harness {
+        let h = Harness()
+        h.settings.sound = .rain
+        h.settings.breakFollowsWorkSound = false
+        h.settings.breakSound = .ocean
+        return h
+    }
+
+    @Test("Al terminar el bloque suena el fondo del descanso, y al revés")
+    func followsCompletedPhases() {
+        let h = harness()
+        let engine = h.makeEngine()
+        engine.start()
+        h.runOutCurrentPhase(engine)
+        #expect(h.effects.ambiences.map(\.kind) == [.ocean])
+
+        engine.start()
+        h.runOutCurrentPhase(engine)
+        #expect(h.effects.ambiences.map(\.kind) == [.ocean, .rain])
+    }
+
+    @Test("Saltar de fase también cambia el fondo")
+    func followsSkips() {
+        let h = harness()
+        let engine = h.makeEngine()
+        engine.skip()
+        #expect(h.effects.ambiences.last?.kind == .ocean)
+    }
+
+    @Test("Con el descanso igual que la concentración se mantiene el sonido")
+    func breakFollowsWork() {
+        let h = harness()
+        h.settings.breakFollowsWorkSound = true
+        let engine = h.makeEngine()
+        engine.skip()
+        #expect(h.effects.ambiences.last?.kind == .rain)
+    }
+
+    @Test("El fondo se aplica antes del arranque automático del descanso")
+    func appliesBeforeAutoStart() {
+        let h = Harness(autoStartBreaks: true)
+        h.settings.sound = .rain
+        h.settings.breakFollowsWorkSound = false
+        h.settings.breakSound = .ocean
+        let engine = h.makeEngine()
+        engine.start()
+        h.runOutCurrentPhase(engine)
+        #expect(engine.phase == .shortBreak && engine.isRunning)
+        #expect(h.effects.ambiences.map(\.kind) == [.ocean])
     }
 }
 

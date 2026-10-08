@@ -82,10 +82,9 @@ struct TimerView: View {
                 showGoalReached = true
             }
         }
-        .onChange(of: engine.phase) { _, newPhase in
+        .onChange(of: engine.phase) { _, _ in
+            // El fondo sonoro de la fase lo cambia el motor.
             wakeControls()
-            // Cada fase puede tener su propio fondo sonoro.
-            AudioService.shared.apply(settings.soundConfig(for: newPhase))
         }
         .onChange(of: scenePhase) { _, new in
             if new == .active {

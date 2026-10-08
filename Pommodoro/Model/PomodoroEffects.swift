@@ -26,6 +26,9 @@ protocol PomodoroEffects {
     func playChime(_ kind: ChimeKind)
     /// Baja el sonido de fondo antes de la campana de fin de fase.
     func fadeOutAmbience()
+    /// Pone el fondo sonoro de la fase que empieza. Lo hace el motor y no la
+    /// vista, para que el cambio ocurra también con la ventana cerrada.
+    func applyAmbience(_ config: SoundConfig)
     func haptic(_ cue: HapticCue)
     func setIdleTimerDisabled(_ disabled: Bool)
 }
@@ -47,6 +50,10 @@ struct SystemEffects: PomodoroEffects {
 
     func fadeOutAmbience() {
         AudioService.shared.fadeOutForPhaseChange()
+    }
+
+    func applyAmbience(_ config: SoundConfig) {
+        AudioService.shared.apply(config)
     }
 
     func haptic(_ cue: HapticCue) {
