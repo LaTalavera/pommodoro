@@ -27,6 +27,11 @@ relajantes sintetizados en tiempo real (incluidos binaurales).
 - El descanso es otra pantalla, no la misma en verde: propone algo concreto
   (mirar lejos, levantarse, beber agua) y deja la cuenta atrás en segundo plano.
 - Cada bloque lleva el nombre de la tarea, con las recientes como sugerencia.
+- Sincronización opcional con Notion: cada bloque de concentración (terminado o
+  abandonado) se añade a una base de datos «Focus Log» con su tarea, duración,
+  resultado e interrupciones. Sin red, los bloques esperan en cola y se envían
+  después; antes de crear cada página se comprueba que no exista, así que
+  reintentar no duplica. El token se guarda en el llavero.
 - Historial en SwiftData: bloques por día, tiempo concentrado, interrupciones y
   la lista de sesiones, distinguiendo las completadas de las abandonadas.
 - El tiempo concentrado suma también los minutos de bloques abandonados; los

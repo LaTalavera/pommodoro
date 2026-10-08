@@ -5,6 +5,9 @@ struct SettingsSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @Bindable private var settings = AppSettings.shared
+    private var notion = NotionSync.shared
+    /// Lo que se teclea en el campo; solo llega al llavero al pulsar Guardar.
+    @State private var notionToken = NotionCredentials.token ?? ""
 
     /// En la ventana de Ajustes del Mac sobra el «Listo»: se cierra como
     /// cualquier ventana.
@@ -109,6 +112,8 @@ struct SettingsSheet: View {
                     Text("El sistema no deja que ninguna app encienda un modo de Concentración por ti. Esto solo detecta si ya tienes uno puesto y te avisa, sin sonido, si empiezas un bloque sin él.")
                 }
 
+                notionSection
+
                 Section {
                     Button {
                         AudioService.shared.playChime(.workStart)
@@ -134,6 +139,42 @@ struct SettingsSheet: View {
         .onChange(of: settings.workMinutes) { _, _ in engine.settingsDidChange() }
         .onChange(of: settings.shortBreakMinutes) { _, _ in engine.settingsDidChange() }
         .onChange(of: settings.longBreakMinutes) { _, _ in engine.settingsDidChange() }
+    }
+
+    private var notionSection: some View {
+        Section {
+            Toggle("Enviar bloques a Notion", isOn: $settings.notionSyncEnabled)
+                .accessibilityIdentifier("notion.enabled")
+            if settings.notionSyncEnabled {
+                SecureField("Token de la integración", text: $notionToken)
+                    .textContentType(.password)
+                    .autocorrectionDisabled()
+                TextField("ID de la base de datos", text: $settings.notionDatabaseID)
+                    .autocorrectionDisabled()
+                Button {
+                    NotionCredentials.token = notionToken.trimmingCharacters(in: .whitespacesAndNewlines)
+                    Task { await notion.flush() }
+                } label: {
+                    Label("Guardar y sincronizar", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(notionToken.isEmpty)
+                LabeledContent("Estado", value: notionStatusText)
+            }
+        } header: {
+            Text("Notion")
+        } footer: {
+            Text("Cada bloque de concentración terminado o abandonado se añade al Focus Log, con su tarea, duración e interrupciones. Si no hay conexión, se guarda y se envía más tarde. El token se guarda en el llavero.")
+        }
+    }
+
+    private var notionStatusText: String {
+        let queued = notion.pending.isEmpty ? "" : " · \(notion.pending.count) en cola"
+        switch notion.status {
+        case .idle: return "Sin enviar aún" + queued
+        case .syncing: return "Enviando…"
+        case .synced(let date): return "Al día (\(date.formatted(date: .omitted, time: .shortened)))" + queued
+        case .failed(let message): return message + queued
+        }
     }
 
     /// Al activarlo pide permiso de lectura de Concentración; si el usuario lo
