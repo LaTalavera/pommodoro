@@ -192,14 +192,7 @@ struct SoundSheet: View {
     private func soundCard(_ kind: SoundKind) -> some View {
         let isSelected = previewedSound == kind
         return Button {
-            if tab == .work {
-                draft.workSound = kind
-            } else {
-                draft.breakSound = kind
-            }
-            saveDraft()
-            preview()
-            Haptics.impact(.light)
+            select(kind)
         } label: {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -238,6 +231,20 @@ struct SoundSheet: View {
         .accessibilityLabel(kind.title)
         .accessibilityHint(kind.subtitle)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+        // Al ignorar los hijos, macOS pierde la acción de pulsar del botón y
+        // VoiceOver no podría elegir el sonido; iOS la conserva igualmente.
+        .accessibilityAction { select(kind) }
+    }
+
+    private func select(_ kind: SoundKind) {
+        if tab == .work {
+            draft.workSound = kind
+        } else {
+            draft.breakSound = kind
+        }
+        saveDraft()
+        preview()
+        Haptics.impact(.light)
     }
 
     private var volumeSection: some View {
