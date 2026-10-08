@@ -79,8 +79,13 @@ xcodebuild -scheme Pommodoro -destination 'platform=macOS' build
 xcodebuild test -scheme Pommodoro-Mac -destination 'platform=macOS'
 ```
 
-Diferencias en Mac: sin Live Activity ni Dynamic Island (solo existen en iOS; las
-del iPhone se reflejan solas en la barra de menús), la pantalla se mantiene
+En Mac la cuenta atrás vive en la barra de menús, con un menú para empezar,
+pausar, saltar o reiniciar sin traer la ventana; cerrar la ventana no cierra la
+app. El icono del Dock lleva los minutos restantes y Ajustes es una ventana
+propia (⌘,).
+
+Diferencias en Mac: sin Live Activity ni Dynamic Island (solo existen en iOS; la
+barra de menús hace ese papel), la pantalla se mantiene
 encendida con una aserción de energía en vez de `isIdleTimerDisabled`, el audio
 no usa `AVAudioSession`, y la respuesta háptica solo se nota en el trackpad. Los
 UI tests (orientación de dispositivo) son solo de iOS y por eso el esquema

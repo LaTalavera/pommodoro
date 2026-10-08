@@ -7,6 +7,9 @@ struct TimerView: View {
     @Environment(PomodoroEngine.self) private var engine
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+    #if os(macOS)
+    @Environment(\.openSettings) private var openSettings
+    #endif
     /// En iPhone, clase de tamaño vertical compacta == apaisado. Se usa en vez
     /// de comparar ancho/alto de un GeometryReader porque así los modificadores
     /// de fuera del árbol de layout (barra de estado, animaciones) también
@@ -276,7 +279,11 @@ struct TimerView: View {
                     showHistory = true
                 }
                 CircleButton(symbol: "slider.horizontal.3", label: "Ajustes", size: 42) {
+                    #if os(macOS)
+                    openSettings()
+                    #else
                     showSettings = true
+                    #endif
                 }
             }
             .opacity(immersive ? 0 : 1)
