@@ -47,6 +47,13 @@ final class AppSettings {
     /// Mezcla de ruido rosa bajo el tono binaural, para que no resulte áspero.
     var binauralNoiseMix: Double { didSet { save(binauralNoiseMix, .binauralNoiseMix) } }
 
+    /// Enviar cada bloque terminado al Focus Log de Notion. El token no vive
+    /// aquí sino en el llavero (`NotionCredentials`).
+    var notionSyncEnabled: Bool { didSet { save(notionSyncEnabled, .notionSyncEnabled) } }
+    var notionDatabaseID: String { didSet { save(notionDatabaseID, .notionDatabaseID) } }
+    /// El Focus Log del LifeOS; se puede cambiar en Ajustes.
+    static let defaultNotionDatabaseID = "7b4ec049d48b4d50bdb7436f05bfc428"
+
     private enum Key: String {
         case workMinutes, shortBreakMinutes, longBreakMinutes, sessionsBeforeLongBreak
         case autoStartBreaks, autoStartWork, keepScreenAwake, hapticsEnabled, chimeEnabled
@@ -54,6 +61,7 @@ final class AppSettings {
         case dailyGoalModeID, dailyGoalMinutes, lastGoalCelebrationDay
         case soundID, soundVolume, binauralBeatHz, binauralCarrierHz, binauralNoiseMix
         case breakFollowsWorkSound, breakSoundID, mixWithOtherAudio, immersionModeID
+        case notionSyncEnabled, notionDatabaseID
     }
 
     private let defaults: UserDefaults
@@ -85,6 +93,8 @@ final class AppSettings {
             Key.breakSoundID.rawValue: SoundKind.none.id,
             Key.mixWithOtherAudio.rawValue: true,
             Key.immersionModeID.rawValue: ImmersionMode.afterDelay.id,
+            Key.notionSyncEnabled.rawValue: false,
+            Key.notionDatabaseID.rawValue: Self.defaultNotionDatabaseID,
         ])
         workMinutes = d.integer(forKey: Key.workMinutes.rawValue)
         shortBreakMinutes = d.integer(forKey: Key.shortBreakMinutes.rawValue)
@@ -111,6 +121,8 @@ final class AppSettings {
         breakSoundID = SoundKind.none.id
         mixWithOtherAudio = d.bool(forKey: Key.mixWithOtherAudio.rawValue)
         immersionModeID = d.string(forKey: Key.immersionModeID.rawValue) ?? ImmersionMode.afterDelay.id
+        notionSyncEnabled = d.bool(forKey: Key.notionSyncEnabled.rawValue)
+        notionDatabaseID = d.string(forKey: Key.notionDatabaseID.rawValue) ?? Self.defaultNotionDatabaseID
     }
 
     private func save(_ value: Any, _ key: Key) {

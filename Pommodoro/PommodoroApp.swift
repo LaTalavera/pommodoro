@@ -14,9 +14,14 @@ struct PommodoroApp: App {
         let container = Self.makeContainer()
         self.container = container
         let engine = PomodoroEngine(
-            recorder: SwiftDataSessionRecorder(context: container.mainContext)
+            recorder: NotionSyncingRecorder(
+                base: SwiftDataSessionRecorder(context: container.mainContext),
+                sync: .shared
+            )
         )
         _engine = State(initialValue: engine)
+        // Lo que quedó sin enviar la última vez (sin red, app cerrada a medias).
+        Task { await NotionSync.shared.flush() }
         #if os(macOS)
         dockBadge = DockBadge(engine: engine)
         #endif
