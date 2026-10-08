@@ -60,16 +60,22 @@ struct PommodoroApp: App {
     }
 
     var body: some Scene {
+        #if os(macOS)
+        // Una sola ventana: hay un único temporizador, y cada ventana
+        // duplicaría el sonido, los avisos y el sondeo de Concentración.
+        Window("Pommodoro", id: "timer") {
+            TimerView()
+                .environment(engine)
+                .frame(minWidth: 480, minHeight: 640)
+        }
+        .defaultSize(width: 960, height: 760)
+        .modelContainer(container)
+        #else
         WindowGroup {
             TimerView()
                 .environment(engine)
-                #if os(macOS)
-                .frame(minWidth: 480, minHeight: 640)
-                #endif
         }
-        #if os(macOS)
-        .defaultSize(width: 960, height: 760)
-        #endif
         .modelContainer(container)
+        #endif
     }
 }

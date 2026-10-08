@@ -56,6 +56,16 @@ struct TimerView: View {
         }
         .preferredColorScheme(.dark)
         .hidingSystemChrome(isLandscape || (engine.isRunning && immersive))
+        #if os(macOS)
+        // En el Mac, mover el ratón devuelve los controles, como en un
+        // reproductor de vídeo. El clic en el fondo no llega: la vista con
+        // scroll del diseño ancho se lo queda.
+        .onContinuousHover { phase in
+            guard case .active = phase, engine.isRunning else { return }
+            immersive = false
+            scheduleDim()
+        }
+        #endif
         .animation(.easeInOut(duration: 0.45), value: immersive)
         .animation(.easeInOut(duration: 0.3), value: isLandscape)
         .onChange(of: engine.isRunning) { _, isRunning in
