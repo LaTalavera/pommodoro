@@ -24,7 +24,7 @@ final class AppSettings {
         set { dailyGoalModeID = newValue.rawValue }
     }
     /// Recordar que actives tu Concentración si empiezas un bloque sin una
-    /// puesta. iOS no deja que ninguna app la active por ti.
+    /// puesta. El sistema no deja que ninguna app la active por ti.
     var suggestFocusMode: Bool { didSet { save(suggestFocusMode, .suggestFocusMode) } }
 
     var autoStartBreaks: Bool { didSet { save(autoStartBreaks, .autoStartBreaks) } }

@@ -92,7 +92,7 @@ struct SoundSheet: View {
                             }
                         }
 
-                        Label("Toca un sonido para escucharlo y aplicarlo. Al iniciar la app, el fondo siempre estará en silencio. Todos los sonidos están disponibles sin conexión.",
+                        Label("Elige un sonido para escucharlo y aplicarlo. Al iniciar la app, el fondo siempre estará en silencio. Todos los sonidos están disponibles sin conexión.",
                               systemImage: "hand.tap")
                             .font(.system(.caption, design: .rounded))
                             .foregroundStyle(.white.opacity(0.45))
