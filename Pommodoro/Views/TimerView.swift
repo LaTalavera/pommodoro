@@ -451,7 +451,7 @@ struct TimerView: View {
         .accessibilityLabel("\(engine.phase.title), \(stateCaption)")
         .accessibilityValue("Quedan \(engine.remaining.spokenString)")
         .accessibilityAddTraits(.updatesFrequently)
-        .accessibilityHint(engine.isRunning ? "Toca dos veces para pausar" : "Toca dos veces para empezar")
+        .accessibilityHint(engine.isRunning ? "Activa para pausar" : "Activa para empezar")
         .accessibilityAdjustableAction { direction in
             guard engine.runState == .idle else { return }
             let current = Int(engine.totalForPhase / 60)
@@ -621,7 +621,7 @@ struct TimerView: View {
 
     // MARK: - Aviso de Concentración
 
-    /// iOS no deja que ninguna app encienda un modo de Concentración por ti;
+    /// El sistema no deja que ninguna app encienda un modo de Concentración por ti;
     /// esto solo lee si ya tienes uno puesto y te lo recuerda si no. Se calla
     /// en cuanto detecta uno activo, y no vuelve a insistir en el mismo bloque.
     @ViewBuilder

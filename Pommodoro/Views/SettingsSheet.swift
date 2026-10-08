@@ -13,6 +13,12 @@ struct SettingsSheet: View {
         ("Profundo", 90, 20, 30),
     ]
 
+    #if os(iOS)
+    private static let immersionFooter = "Con el reloj en marcha los controles se retiran para dejar solo la cuenta atrás. Desliza hacia arriba para que ocurra al momento, o toca la pantalla para recuperarlos."
+    #else
+    private static let immersionFooter = "Con el reloj en marcha los controles se retiran para dejar solo la cuenta atrás. Haz clic en la ventana para recuperarlos."
+    #endif
+
     var body: some View {
         NavigationStack {
             Form {
@@ -86,13 +92,13 @@ struct SettingsSheet: View {
                 } header: {
                     Text("Durante la sesión")
                 } footer: {
-                    Text("Con el reloj en marcha los controles se retiran para dejar solo la cuenta atrás. Desliza hacia arriba para que ocurra al momento, o toca la pantalla para recuperarlos.")
+                    Text(Self.immersionFooter)
                 }
 
                 Section {
                     Toggle("Recordar activar Concentración", isOn: focusToggleBinding)
                 } footer: {
-                    Text("iOS no deja que ninguna app encienda un modo de Concentración por ti. Esto solo detecta si ya tienes uno puesto y te avisa, sin sonido, si empiezas un bloque sin él.")
+                    Text("El sistema no deja que ninguna app encienda un modo de Concentración por ti. Esto solo detecta si ya tienes uno puesto y te avisa, sin sonido, si empiezas un bloque sin él.")
                 }
 
                 Section {
