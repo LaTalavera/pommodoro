@@ -398,6 +398,8 @@ final class PomodoroEngine {
         clearPhaseTracking()
         remaining = totalForPhase
         runState = .idle
+        // Cada fase puede tener su propio fondo sonoro.
+        effects.applyAmbience(settings.soundConfig(for: phase))
         if autoStart {
             start()
         } else {
